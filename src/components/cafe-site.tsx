@@ -93,7 +93,10 @@ export function CafeSite() {
 
   const visibleItems = category === "All" ? menuItems : menuItems.filter((item) => item.category === category);
   const order = useMemo(
-    () => menuItems.filter((item) => cart[item.id]).map((item) => ({ ...item, quantity: cart[item.id] })),
+    () => menuItems.flatMap((item) => {
+      const quantity = cart[item.id] ?? 0;
+      return quantity > 0 ? [{ ...item, quantity }] : [];
+    }),
     [cart],
   );
   const itemCount = order.reduce((sum, item) => sum + item.quantity, 0);
