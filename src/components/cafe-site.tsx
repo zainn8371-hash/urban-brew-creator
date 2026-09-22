@@ -1,8 +1,7 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   ArrowRight,
   Bean,
-  Check,
   ChevronDown,
   Clock3,
   Coffee,
@@ -11,19 +10,16 @@ import {
   Leaf,
   MapPin,
   Menu,
-  Minus,
   Phone,
-  Plus,
   Quote,
-  ShoppingBag,
   Star,
-  UtensilsCrossed,
 } from "lucide-react";
 
 import heroImage from "@/assets/cafe-hero.jpg";
 import coffeeImage from "@/assets/cafe-coffee.jpg";
 import foodImage from "@/assets/cafe-food.jpg";
 import dessertImage from "@/assets/cafe-dessert.jpg";
+import baristaVideo from "@/assets/up-town-barista.mp4.asset.json";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -36,11 +32,12 @@ import {
 } from "@/components/ui/sheet";
 
 const CONTACT = {
-  address: "[Cafe Address], Lahore, Pakistan",
-  phone: "[Phone Number]",
-  whatsapp: "[WhatsApp Number]",
+  address: "55, Block C1, Block C Phase 1, Johar Town, Lahore, Punjab 54000, Pakistan",
+  phone: "+92 321 5433336",
+  whatsapp: "+92 321 5433336",
   hours: "[Opening Hours]",
-  whatsappUrl: "https://wa.me/",
+  whatsappUrl: "https://wa.me/923215433336",
+  instagramUrl: "https://instagram.com/cafeuptown.lhr",
 };
 
 const menuItems = [
@@ -70,8 +67,6 @@ const reviews = [
   { quote: "Great food, friendly staff, and a really comfortable environment. Their iced latte is a must.", name: "Hamza R.", detail: "Regular guest" },
 ];
 
-type Cart = Record<number, number>;
-
 function BrandMark({ compact = false }: { compact?: boolean }) {
   return (
     <a href="#home" className="group flex items-center gap-3" aria-label="Up Town Cafe home">
@@ -88,34 +83,7 @@ function BrandMark({ compact = false }: { compact?: boolean }) {
 
 export function CafeSite() {
   const [category, setCategory] = useState("All");
-  const [cart, setCart] = useState<Cart>({});
-  const [cartOpen, setCartOpen] = useState(false);
-
   const visibleItems = category === "All" ? menuItems : menuItems.filter((item) => item.category === category);
-  const order = useMemo(
-    () => menuItems.flatMap((item) => {
-      const quantity = cart[item.id] ?? 0;
-      return quantity > 0 ? [{ ...item, quantity }] : [];
-    }),
-    [cart],
-  );
-  const itemCount = order.reduce((sum, item) => sum + item.quantity, 0);
-  const total = order.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-  function changeQuantity(id: number, amount: number) {
-    setCart((current) => {
-      const next = Math.max(0, (current[id] ?? 0) + amount);
-      const updated = { ...current, [id]: next };
-      if (next === 0) delete updated[id];
-      return updated;
-    });
-  }
-
-  function openWhatsApp() {
-    const lines = order.map((item) => `${item.quantity} × ${item.name} — Rs. ${(item.quantity * item.price).toLocaleString()}`);
-    const message = encodeURIComponent(`Hello Up Town Cafe! I'd like to order:\n\n${lines.join("\n")}\n\nTotal: Rs. ${total.toLocaleString()}`);
-    window.open(`${CONTACT.whatsappUrl}?text=${message}`, "_blank", "noopener,noreferrer");
-  }
 
   return (
     <main className="overflow-x-hidden bg-background text-foreground">
@@ -130,10 +98,7 @@ export function CafeSite() {
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <Button onClick={() => setCartOpen(true)} className="relative hidden h-11 bg-copper px-5 text-copper-foreground shadow-none hover:bg-copper/90 sm:inline-flex">
-              <ShoppingBag /> Order now
-              {itemCount > 0 && <span className="ml-1 grid size-5 place-items-center rounded-full bg-hero text-[10px] text-hero-foreground">{itemCount}</span>}
-            </Button>
+            <Button asChild className="hidden h-11 bg-copper px-5 text-copper-foreground shadow-none hover:bg-copper/90 sm:inline-flex"><a href={CONTACT.whatsappUrl} target="_blank" rel="noreferrer">WhatsApp us <ArrowRight /></a></Button>
             <Sheet>
               <SheetTrigger asChild>
                 <Button size="icon" variant="ghost" className="text-hero-foreground hover:bg-hero-foreground/10 hover:text-hero-foreground lg:hidden" aria-label="Open navigation"><Menu /></Button>
@@ -143,7 +108,7 @@ export function CafeSite() {
                 <nav className="mt-10 grid gap-2">
                   {navItems.map((item) => <SheetClose asChild key={item}><a href={`#${item.toLowerCase()}`} className="border-b border-border py-4 font-display text-3xl">{item}</a></SheetClose>)}
                 </nav>
-                <Button className="mt-8 w-full" onClick={() => setCartOpen(true)}><ShoppingBag /> Order now</Button>
+                <Button asChild className="mt-8 w-full"><a href={CONTACT.whatsappUrl} target="_blank" rel="noreferrer">WhatsApp us <ArrowRight /></a></Button>
               </SheetContent>
             </Sheet>
           </div>
@@ -151,7 +116,7 @@ export function CafeSite() {
       </header>
 
       <section id="home" className="relative min-h-[760px] bg-hero text-hero-foreground md:min-h-[820px]">
-        <img src={heroImage} alt="The warmly lit interior of Up Town Cafe" width={1600} height={1200} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover object-[64%_center]" />
+        <video autoPlay muted loop playsInline poster={heroImage} aria-label="A barista carefully preparing coffee" className="absolute inset-0 h-full w-full object-cover object-center"><source src={baristaVideo.url} type="video/mp4" /></video>
         <div className="absolute inset-0 bg-hero-overlay" />
         <div className="relative mx-auto flex min-h-[760px] max-w-[1440px] items-end px-5 pb-16 pt-32 sm:px-8 md:min-h-[820px] md:items-center md:pb-24 lg:px-12">
           <div className="max-w-3xl animate-rise">
@@ -181,7 +146,6 @@ export function CafeSite() {
           </div>
           <div className="mt-10 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
             {visibleItems.map((item, index) => {
-              const qty = cart[item.id] ?? 0;
               return (
                 <article key={item.id} className="group min-w-0">
                   <div className="relative aspect-[4/4.6] overflow-hidden rounded-md bg-muted">
@@ -189,20 +153,10 @@ export function CafeSite() {
                     <span className="absolute left-3 top-3 rounded-full bg-background/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] backdrop-blur">{item.category}</span>
                   </div>
                   <div className="mt-5 flex items-start justify-between gap-3"><div><h3 className="font-display text-2xl">{item.name}</h3><p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p></div><p className="shrink-0 text-sm font-bold">Rs. {item.price.toLocaleString()}</p></div>
-                  <div className="mt-5">
-                    {qty === 0 ? <Button onClick={() => changeQuantity(item.id, 1)} variant="outline" className="w-full bg-transparent">Add to order <Plus /></Button> : (
-                      <div className="flex h-9 items-center justify-between rounded-md border border-primary bg-primary text-primary-foreground">
-                        <Button size="icon" variant="ghost" onClick={() => changeQuantity(item.id, -1)} className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" aria-label={`Remove one ${item.name}`}><Minus /></Button>
-                        <span className="text-sm font-semibold">{qty} in order</span>
-                        <Button size="icon" variant="ghost" onClick={() => changeQuantity(item.id, 1)} className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" aria-label={`Add one ${item.name}`}><Plus /></Button>
-                      </div>
-                    )}
-                  </div>
                 </article>
               );
             })}
           </div>
-          {itemCount > 0 && <div className="sticky bottom-5 z-30 mx-auto mt-12 flex max-w-xl items-center justify-between rounded-md bg-primary p-3 pl-5 text-primary-foreground shadow-xl"><div><p className="text-xs text-primary-foreground/70">{itemCount} {itemCount === 1 ? "item" : "items"}</p><p className="font-semibold">Rs. {total.toLocaleString()}</p></div><Button onClick={() => setCartOpen(true)} className="bg-copper text-copper-foreground hover:bg-copper/90">View order <ArrowRight /></Button></div>}
         </div>
       </section>
 
@@ -218,7 +172,7 @@ export function CafeSite() {
       </section>
 
       <section id="gallery" className="scroll-mt-20 py-24 sm:py-32">
-        <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12"><div className="flex items-end justify-between gap-8"><div><p className="section-kicker">Scenes from Up Town</p><h2 className="section-title">Come in.<br /><em>Stay awhile.</em></h2></div><Instagram className="mb-2 hidden size-8 text-copper sm:block" /></div>
+        <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12"><div className="flex items-end justify-between gap-8"><div><p className="section-kicker">Scenes from Up Town</p><h2 className="section-title">Come in.<br /><em>Stay awhile.</em></h2></div><a href={CONTACT.instagramUrl} target="_blank" rel="noreferrer" aria-label="Follow cafeuptown.lhr on Instagram"><Instagram className="mb-2 hidden size-8 text-copper sm:block" /></a></div>
           <div className="mt-12 grid auto-rows-[220px] grid-cols-2 gap-3 md:auto-rows-[260px] md:grid-cols-4">
             <figure className="group col-span-2 row-span-2 overflow-hidden rounded-md"><img src={heroImage} alt="Up Town Cafe interior" width={1600} height={1200} loading="lazy" className="gallery-image" /></figure>
             <figure className="group overflow-hidden rounded-md"><img src={coffeeImage} alt="Signature latte" width={1200} height={1200} loading="lazy" className="gallery-image" /></figure>
@@ -240,16 +194,13 @@ export function CafeSite() {
           <div className="flex gap-4 py-5"><MapPin className="mt-0.5 size-5 shrink-0 text-copper" /><div><p className="text-xs font-bold uppercase tracking-[0.12em]">Address</p><p className="mt-2 text-sm text-muted-foreground">{CONTACT.address}</p></div></div>
           <div className="flex gap-4 py-5"><Clock3 className="mt-0.5 size-5 shrink-0 text-copper" /><div><p className="text-xs font-bold uppercase tracking-[0.12em]">Opening hours</p><p className="mt-2 text-sm text-muted-foreground">{CONTACT.hours}</p></div></div>
           <div className="flex gap-4 py-5"><Phone className="mt-0.5 size-5 shrink-0 text-copper" /><div><p className="text-xs font-bold uppercase tracking-[0.12em]">Call or WhatsApp</p><p className="mt-2 text-sm text-muted-foreground">{CONTACT.phone} · {CONTACT.whatsapp}</p></div></div>
-        </div><div className="mt-7 flex flex-wrap gap-2"><Button asChild><a href="tel:"><Phone /> Call us</a></Button><Button asChild variant="outline"><a href={CONTACT.whatsappUrl} target="_blank" rel="noreferrer">WhatsApp us <ArrowRight /></a></Button><Button asChild variant="ghost"><a href="https://instagram.com" target="_blank" rel="noreferrer"><Instagram /> Instagram</a></Button></div></div>
+        </div><div className="mt-7 flex flex-wrap gap-2"><Button asChild><a href="tel:+923215433336"><Phone /> Call us</a></Button><Button asChild variant="outline"><a href={CONTACT.whatsappUrl} target="_blank" rel="noreferrer">WhatsApp us <ArrowRight /></a></Button><Button asChild variant="ghost"><a href={CONTACT.instagramUrl} target="_blank" rel="noreferrer"><Instagram /> @cafeuptown.lhr</a></Button></div></div>
           <div className="relative min-h-[500px] overflow-hidden rounded-md bg-primary"><img src={heroImage} alt="Up Town Cafe location placeholder" width={1600} height={1200} loading="lazy" className="absolute inset-0 h-full w-full object-cover opacity-50" /><div className="absolute inset-0 grid place-items-center bg-map-overlay p-6 text-center text-primary-foreground"><div><span className="mx-auto grid size-16 place-items-center rounded-full bg-copper text-copper-foreground"><MapPin className="size-7" /></span><p className="mt-5 font-display text-3xl">Up Town Cafe</p><p className="mt-2 text-sm text-primary-foreground/70">{CONTACT.address}</p><Button variant="outline" className="mt-6 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">Get directions <ArrowRight /></Button></div></div></div>
         </div>
       </section>
 
-      <footer className="bg-hero px-5 py-14 text-hero-foreground sm:px-8 lg:px-12"><div className="mx-auto max-w-[1440px]"><div className="flex flex-col justify-between gap-10 border-b border-hero-foreground/15 pb-12 md:flex-row md:items-end"><div><BrandMark /><p className="mt-5 font-display text-2xl text-hero-foreground/70">Good Coffee. Great Food. Better Moments.</p></div><div className="flex flex-wrap gap-x-6 gap-y-3">{["Home", "Menu", "About", "Gallery", "Contact"].map((item) => <a key={item} href={`#${item.toLowerCase()}`} className="text-xs font-bold uppercase tracking-[0.12em] text-hero-foreground/70 hover:text-hero-foreground">{item}</a>)}</div></div><div className="flex flex-col justify-between gap-5 pt-7 text-xs text-hero-foreground/45 sm:flex-row"><p>© 2026 Up Town Cafe. All rights reserved.</p><div className="flex gap-5"><a href="https://instagram.com">Instagram</a><a href="https://facebook.com">Facebook</a><a href="https://tiktok.com">TikTok</a><a href={CONTACT.whatsappUrl}>WhatsApp</a></div></div></div></footer>
+      <footer className="bg-hero px-5 py-14 text-hero-foreground sm:px-8 lg:px-12"><div className="mx-auto max-w-[1440px]"><div className="flex flex-col justify-between gap-10 border-b border-hero-foreground/15 pb-12 md:flex-row md:items-end"><div><BrandMark /><p className="mt-5 font-display text-2xl text-hero-foreground/70">Good Coffee. Great Food. Better Moments.</p></div><div className="flex flex-wrap gap-x-6 gap-y-3">{["Home", "Menu", "About", "Gallery", "Contact"].map((item) => <a key={item} href={`#${item.toLowerCase()}`} className="text-xs font-bold uppercase tracking-[0.12em] text-hero-foreground/70 hover:text-hero-foreground">{item}</a>)}</div></div><div className="flex flex-col justify-between gap-5 pt-7 text-xs text-hero-foreground/45 sm:flex-row"><p>© 2026 Up Town Cafe. All rights reserved.</p><div className="flex gap-5"><a href={CONTACT.instagramUrl} target="_blank" rel="noreferrer">Instagram</a><a href="https://facebook.com">Facebook</a><a href="https://tiktok.com">TikTok</a><a href={CONTACT.whatsappUrl}>WhatsApp</a></div></div></div></footer>
 
-      <Button onClick={() => setCartOpen(true)} size="icon" className="fixed bottom-5 right-5 z-40 size-14 rounded-full bg-copper text-copper-foreground shadow-xl hover:bg-copper/90 sm:hidden" aria-label={`Open order with ${itemCount} items`}><ShoppingBag />{itemCount > 0 && <span className="absolute -right-1 -top-1 grid size-5 place-items-center rounded-full bg-primary text-[10px] text-primary-foreground">{itemCount}</span>}</Button>
-
-      <Sheet open={cartOpen} onOpenChange={setCartOpen}><SheetContent className="flex w-[92vw] flex-col bg-background sm:max-w-md"><SheetHeader className="text-left"><SheetTitle className="font-display text-3xl">Your order</SheetTitle><SheetDescription>Review your picks, then send your order on WhatsApp.</SheetDescription></SheetHeader><div className="mt-7 flex-1 space-y-5 overflow-y-auto">{order.length === 0 ? <div className="grid h-64 place-items-center rounded-md border border-dashed border-border text-center"><div><ShoppingBag className="mx-auto size-8 text-muted-foreground" /><p className="mt-3 font-semibold">Your bag is empty</p><p className="mt-1 text-sm text-muted-foreground">Add something delicious from the menu.</p></div></div> : order.map((item) => <div key={item.id} className="flex gap-4"><img src={item.image} alt="" width={80} height={80} className="size-20 rounded-md object-cover" /><div className="min-w-0 flex-1"><div className="flex justify-between gap-2"><p className="font-semibold">{item.name}</p><p className="shrink-0 text-sm">Rs. {(item.price * item.quantity).toLocaleString()}</p></div><div className="mt-3 flex items-center gap-3"><Button size="icon" variant="outline" className="size-7" onClick={() => changeQuantity(item.id, -1)} aria-label={`Remove one ${item.name}`}><Minus /></Button><span className="text-sm font-semibold">{item.quantity}</span><Button size="icon" variant="outline" className="size-7" onClick={() => changeQuantity(item.id, 1)} aria-label={`Add one ${item.name}`}><Plus /></Button></div></div></div>)}</div>{order.length > 0 && <div className="border-t border-border pt-5"><div className="mb-5 flex items-center justify-between"><div><p className="text-xs text-muted-foreground">Estimated total</p><p className="font-display text-3xl">Rs. {total.toLocaleString()}</p></div><span className="flex items-center gap-1 text-xs text-muted-foreground"><Check className="size-3 text-copper" /> Ready to send</span></div><Button onClick={openWhatsApp} className="h-12 w-full">Order on WhatsApp <ArrowRight /></Button><p className="mt-3 text-center text-[11px] leading-5 text-muted-foreground">Final availability and collection details will be confirmed on WhatsApp.</p></div>}</SheetContent></Sheet>
     </main>
   );
 }
